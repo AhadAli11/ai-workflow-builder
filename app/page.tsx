@@ -82,12 +82,40 @@ export default function Home() {
       },
     ]);
   };
+  const runWorkflowHandler = async () => {
+    if (nodes.length === 0) return;
 
+    const payload = {
+      nodes: nodes.map((n) => ({
+        id: n.id,
+        prompt: (n.data as { prompt: string }).prompt,
+        label: (n.data as { label: string }).label,
+      })),
+      edges: edges.map((e) => ({
+        source: e.source,
+        sourceHandle: e.sourceHandle,
+        target: e.target,
+      })),
+      startNodeId: nodes[0].id,
+    };
+
+    const res = await fetch("/api/run-workflow", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    console.log("Workflow triggered:", data);
+    alert(`Workflow started! Check the Inngest dashboard (localhost:8288) for the run.`);
+  };
   return (
     <div className="h-screen w-screen flex flex-col">
       <div className="p-3 border-b flex gap-2 items-center">
         <h1 className="font-semibold text-lg mr-4">AI Workflow Builder</h1>
         <Button onClick={addNode} size="sm">+ Add Node</Button>
+        <Button onClick={runWorkflowHandler} size="sm" variant="default">
+          ▶ Run Workflow
+        </Button>
       </div>
       <div className="flex-1">
         <ReactFlow
