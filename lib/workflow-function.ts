@@ -1,6 +1,6 @@
 import { inngest } from "./inngest";
 import { openai, MODEL } from "./openai";
-
+import { saveRunResult } from "./run-store";
 type WorkflowNode = {
     id: string;
     prompt: string;
@@ -63,6 +63,10 @@ export const runWorkflow = inngest.createFunction(
             );
             currentNodeId = nextEdge?.target;
         }
+
+        await step.run("save-result", async () => {
+            saveRunResult(event.id as string, { executionLog });
+        });
 
         return { executionLog };
     }

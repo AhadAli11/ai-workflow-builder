@@ -5,10 +5,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 
 export function DecisionNode({ data, id }: NodeProps) {
-    const nodeData = data as { prompt: string; label: string; onPromptChange?: (id: string, value: string) => void };
+    const nodeData = data as {
+        prompt: string;
+        label: string;
+        status?: "idle" | "active" | "done";
+        onPromptChange?: (id: string, value: string) => void;
+    };
+
+    const borderClass =
+        nodeData.status === "active"
+            ? "border-blue-500 ring-2 ring-blue-300 animate-pulse"
+            : nodeData.status === "done"
+                ? "border-green-600"
+                : "border-border";
 
     return (
-        <Card className="p-3 w-64 border-2">
+        <Card className={`p-3 w-64 border-2 ${borderClass} transition-colors`}>
             <div className="text-xs font-semibold mb-2 text-muted-foreground">
                 {nodeData.label || "Decision"}
             </div>
@@ -27,18 +39,8 @@ export function DecisionNode({ data, id }: NodeProps) {
                 <span className="text-red-600 font-medium">NO ↓</span>
             </div>
 
-            <Handle
-                type="source"
-                position={Position.Bottom}
-                id="yes"
-                style={{ left: "25%", background: "#16a34a" }}
-            />
-            <Handle
-                type="source"
-                position={Position.Bottom}
-                id="no"
-                style={{ left: "75%", background: "#dc2626" }}
-            />
+            <Handle type="source" position={Position.Bottom} id="yes" style={{ left: "25%", background: "#16a34a" }} />
+            <Handle type="source" position={Position.Bottom} id="no" style={{ left: "75%", background: "#dc2626" }} />
         </Card>
     );
 }
